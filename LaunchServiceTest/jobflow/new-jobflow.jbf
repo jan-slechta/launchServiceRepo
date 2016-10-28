@@ -44,6 +44,9 @@
 <RichTextNote backgroundColor="FAF6D6" folded="false" fontSize="medium" height="223" id="Note2" textColor="444444" width="406" x="636" y="64">
 <attr name="text"><![CDATA[h3. 3. Return transformed file to Launch Service]]></attr>
 </RichTextNote>
+<RichTextNote backgroundColor="FAF6D6" folded="false" fontSize="medium" height="57" id="Note3" textColor="444444" width="1014" x="28" y="-1">
+<attr name="text"><![CDATA[h3. Master jobflow]]></attr>
+</RichTextNote>
 <Dictionary>
 <Entry contentType="text/plain" input="true" name="input" output="false" type="readable.channel"/>
 <Entry contentType="text/plain" input="false" name="output.dat" output="true" type="writable.channel"/>
