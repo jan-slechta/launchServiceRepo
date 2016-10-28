@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="Jan Slechta" created="Fri Oct 28 11:12:41 EDT 2016" guiVersion="4.3.0" id="1477670185269" licenseCode="CLP1DJAVLI15616235BY" name="new-jobflow" nature="jobflow" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record eofAsDelimiter="true" fieldDelimiter="|" name="Record" previewAttachmentCharset="ISO-8859-1" type="delimited">
+<Field name="recordContent" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="recordName1" recordDelimiter="\r\n" type="delimited">
+<Field name="fileUrl" type="string"/>
+</Record>
+</Metadata>
+<MetadataGroup name="Implicit metadata" type="implicit">
+<Metadata id="__static_metadata_EXECUTE_GRAPH_ExecuteGraph_RunStatus">
+<Record fieldDelimiter="|" name="ExecuteGraph_RunStatus" recordDelimiter="\n" type="delimited">
+<Field name="runId" trim="true" type="long"/>
+<Field name="originalJobURL" type="string"/>
+<Field format="yyyy-MM-dd HH:mm:ss" name="startTime" trim="true" type="date"/>
+<Field format="yyyy-MM-dd HH:mm:ss" name="endTime" trim="true" type="date"/>
+<Field name="duration" trim="true" type="long"/>
+<Field name="executionGroup" type="string"/>
+<Field name="executionLabel" type="string"/>
+<Field name="status" type="string"/>
+<Field name="errException" type="string"/>
+<Field name="errMessage" type="string"/>
+<Field name="errComponent" type="string"/>
+<Field name="errComponentType" type="string"/>
+</Record>
+</Metadata>
+</MetadataGroup>
+<GraphParameters>
+<GraphParameter name="TEMP_FILE" value="${DATATMP_DIR}/${RUN_ID}/tempFileFromLS">
+<ComponentReference referencedComponent="FLAT_FILE_WRITER" referencedProperty="fileURL"/>
+</GraphParameter>
+<GraphParameterFile fileURL="workspace.prm"/>
+</GraphParameters>
+<RichTextNote backgroundColor="FAF6D6" folded="false" fontSize="medium" height="219" id="Note0" textColor="444444" width="365" x="28" y="66">
+<attr name="text"><![CDATA[h3. 1. Read data from Launch Service]]></attr>
+</RichTextNote>
+<RichTextNote backgroundColor="FAF6D6" folded="false" fontSize="medium" height="223" id="Note1" textColor="444444" width="206" x="410" y="64">
+<attr name="text"><![CDATA[h3. 2. Transform file]]></attr>
+</RichTextNote>
+<RichTextNote backgroundColor="FAF6D6" folded="false" fontSize="medium" height="223" id="Note2" textColor="444444" width="406" x="636" y="64">
+<attr name="text"><![CDATA[h3. 3. Return transformed file to Launch Service]]></attr>
+</RichTextNote>
+<Dictionary>
+<Entry contentType="text/plain" input="true" name="input" output="false" type="readable.channel"/>
+<Entry contentType="text/plain" input="false" name="output.dat" output="true" type="writable.channel"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node fileURL="dict:input:discrete" guiName="FlatFileReader" guiX="61" guiY="150" id="FLAT_FILE_READER" type="FLAT_FILE_READER"/>
+<Node fileURL="${TEMP_FILE}" guiName="FlatFileWriter" guiX="240" guiY="150" id="FLAT_FILE_WRITER" makeDirs="true" type="FLAT_FILE_WRITER"/>
+<Edge fromNode="FLAT_FILE_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="FLAT_FILE_WRITER:0"/>
+</Phase>
+<Phase number="5">
+<Node errorMessage="Metadata didn't match the file content." guiName="Fail" guiX="662" guiY="295" id="FAIL" type="FAIL"/>
+<Node fileURL="port:$0.fileUrl:source" guiName="FlatFileReader" guiX="662" guiY="150" id="FLAT_FILE_READER1" type="FLAT_FILE_READER"/>
+<Node fileURL="dict:output.dat:stream" guiName="FlatFileWriter" guiX="878" guiY="150" id="FLAT_FILE_WRITER1" type="FLAT_FILE_WRITER"/>
+<Node guiName="ReadCustomers" guiX="453" guiY="150" id="READ_CUSTOMERS" jobURL="${GRAPH_DIR}/ReadCustomers.grf" stopOnFail="false" type="EXECUTE_GRAPH">
+<attr name="inputMapping"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	
+	//$out.1.SOURCE_FILE_URL = getParamValue("DATATMP_DIR") + "/" + getParamValue("RUN_ID") + "/tempFileFromLS";
+	$out.1.SOURCE_FILE_URL = getParamValue("TEMP_FILE");
+
+	return ALL;
+}
+]]></attr>
+<attr name="outputMapping"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.fileUrl = getParamValue("TEMP_FILE");
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="FLAT_FILE_READER1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="FLAT_FILE_WRITER1:0"/>
+<Edge fromNode="READ_CUSTOMERS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (input)" metadata="Metadata1" outPort="Port 0 (out)" toNode="FLAT_FILE_READER1:0"/>
+<Edge fromNode="READ_CUSTOMERS:1" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" outPort="Port 1 (error)" persistedImplicitMetadata="__static_metadata_EXECUTE_GRAPH_ExecuteGraph_RunStatus" toNode="FAIL:0"/>
+</Phase>
+</Graph>

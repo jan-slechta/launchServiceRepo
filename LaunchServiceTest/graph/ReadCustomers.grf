@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="Jan Slechta" created="Fri Oct 28 11:12:41 EDT 2016" guiVersion="4.3.0" id="1477668148586" licenseCode="CLP1DJAVLI15616235BY" name="ReadCustomers" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachment="${DATAIN_DIR}/customers.dat" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" label="customers.dat" name="customers_dat" previewAttachment="${DATAIN_DIR}/customers.dat" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
+<Field name="customerId" type="integer"/>
+<Field name="firstName" type="string"/>
+<Field name="lastName" type="string"/>
+<Field name="street" type="string"/>
+<Field name="city" type="string"/>
+<Field name="zipCode" type="integer"/>
+<Field name="state" type="string"/>
+<Field format="yyyy-MM-dd" name="createdDate" type="date"/>
+<Field eofAsDelimiter="true" name="closedDate" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="DataExtraction" recordDelimiter="\r\n" type="delimited">
+<Field name="id" type="integer"/>
+</Record>
+</Metadata>
+<GraphParameters>
+<GraphParameter name="SOURCE_FILE_URL" public="false" value="${DATAIN_DIR}/customers.dat">
+<ComponentReference referencedComponent="FLAT_FILE_READER" referencedProperty="fileURL"/>
+</GraphParameter>
+<GraphParameterFile fileURL="workspace.prm"/>
+</GraphParameters>
+<RichTextNote backgroundColor="FAF6D6" folded="false" fontSize="medium" height="252" id="Note0" textColor="444444" width="719" x="38" y="18">
+<attr name="text"><![CDATA[h3. Transform data file]]></attr>
+</RichTextNote>
+<Dictionary>
+<Entry contentType="text/plain" input="false" name="output.dat" output="true" type="writable.channel"/>
+<Entry contentType="application/octet-stream" input="true" name="input" output="false" type="readable.channel"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node fileURL="${SOURCE_FILE_URL}" guiName="FlatFileReader" guiX="83" guiY="109" id="FLAT_FILE_READER" type="FLAT_FILE_READER"/>
+<Node guiName="Reformat" guiX="330" guiY="109" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.id = $in.0.customerId;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge debugMode="true" fromNode="FLAT_FILE_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge debugMode="true" fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="FLAT_FILE_WRITER:0"/>
+</Phase>
+<Phase number="5">
+<Node fileURL="${SOURCE_FILE_URL}" guiName="FlatFileWriter" guiX="592" guiY="109" id="FLAT_FILE_WRITER" type="FLAT_FILE_WRITER"/>
+</Phase>
+</Graph>
